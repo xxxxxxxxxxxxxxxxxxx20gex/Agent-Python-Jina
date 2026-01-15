@@ -19,9 +19,7 @@ APIKEY = os.getenv("APIKEY")
 JINA = os.getenv("JINA")
 
 db = SqliteDb(db_file="tmp/test_workflow.db")
-db_mem = SqliteDb(db_file="tmp/memory.db")
 
-# 创建智能助手实例
 deep_read_agent = Agent(
     name="智能助手",
     model=OpenAILike(
@@ -31,44 +29,12 @@ deep_read_agent = Agent(
         temperature=0.2,  # 略微提高温度以增加创造性
     ),
     db = db,
-    # === 核心智能增强配置 ===
-    
-    # 1. 推理能力 - 启用逐步思考
-    reasoning=True,
-    reasoning_min_steps=2,
-    reasoning_max_steps=15,
-    
-    # 2. 记忆管理 - 启用长期记忆
-    memory_manager=MemoryManager(
-                        model=OpenAILike(
-                            id=CC, 
-                            base_url=BASEURL, 
-                            api_key=APIKEY
-                        ),
-                        db=db_mem,
-                    ),
     enable_user_memories=True,  # 启用用户记忆
     enable_agentic_memory=True,  # 启用智能记忆管理
     add_memories_to_context=True,  # 将记忆添加到上下文
-    
-    # 3. 学习机制 - 启用持续学习
-    # learning=True,  # 启用学习机器
-    # add_learnings_to_context=True,  # 将学习结果添加到上下文
-    
-    # 4. 文化知识 - 启用共享知识
-    # culture_manager=CultureManager(model=OpenAILike(id=CC, base_url=BASEURL, api_key=APIKEY)),
-    # enable_agentic_culture=True,  # 启用智能文化管理
-    # update_cultural_knowledge=True,  # 更新文化知识
-    # add_culture_to_context=True,  # 将文化知识添加到上下文
-    
-    # 5. 会话管理 - 增强会话理解
-    # enable_session_summaries=True,  # 启用会话摘要
-    # add_session_summary_to_context=True,  # 将会话摘要添加到上下文
     add_history_to_context=True,  
     num_history_runs=5,  # 增加历史记录数量
     max_tool_calls_from_history=None,  # 限制历史中的工具调用
-    
-    # 6. 状态管理 - 启用智能状态
     add_session_state_to_context=True,  # 启用会话状态
     enable_agentic_state=True,  # 启用智能状态管理
     cache_session=True,  # 启用会话缓存
@@ -87,10 +53,10 @@ deep_read_agent = Agent(
         # Python 解释器
         MCPTools(
             transport="stdio",
-            command=r"python -m mcp_python_interpreter.main --dir C:\\Users\\填写自己的目录\\Desktop\\test-kimi\\play\\workspace --python-path D:\\app\\anaconda\\envs\\myconda\\python.exe",
+            command=r"python -m mcp_python_interpreter.main --dir C:\\Users\\WUJIEAI\\Desktop\\test-kimi\\play\\workspace --python-path D:\\app\\anaconda\\envs\\myconda\\python.exe",
             env={
                 "MCP_ALLOW_SYSTEM_ACCESS": "0",
-                "PYTHONPATH": r"C:\\Users\\填写自己的目录\\Desktop\\test-kimi\\play\\mcp\\mcp-python-interpreter"
+                "PYTHONPATH": r"C:\\Users\\WUJIEAI\\Desktop\\test-kimi\\play\\mcp\\mcp-python-interpreter"  # 就是当前项目的mcp文件下的mcp-python-interpreter的绝对路径
             }
         ),
         # Puppeteer 浏览器自动化
@@ -101,8 +67,7 @@ deep_read_agent = Agent(
         #     # exclude_tools= ['puppeteer_screenshot'],
         # ),
     ],
-    # tool_call_limit=15,  # 增加工具调用限制
-    
+
     # === 上下文增强 ===
     markdown=True,
     add_datetime_to_context=True,
@@ -113,7 +78,7 @@ deep_read_agent = Agent(
     stream=True, 
     store_tool_messages=False,  # 存储工具消息以便学习
     store_history_messages=True,  
-    store_media=True,
+    store_media=False,
     
     # === 调试配置 ===
     debug_mode=False,  # 启用调试模式
@@ -136,7 +101,6 @@ deep_read_agent = Agent(
     - 提供结构化的、详细的回答
     """,
     
-    # === 额外指令 ===
     instructions=[
         "在回答复杂问题前，总是进行多步骤推理",
         "主动使用记忆工具记录重要信息",
@@ -159,9 +123,6 @@ deep_read_agent = Agent(
     delay_between_retries=1,
     exponential_backoff=True,
     
-    # === 结构化输出支持 ===
-    structured_outputs=True,  # 启用结构化输出
-    parse_response=True,
 )
 
 agent_os = AgentOS(

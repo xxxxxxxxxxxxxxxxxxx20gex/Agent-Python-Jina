@@ -95,7 +95,7 @@ class JinaReaderTools(Toolkit):
             "Accept": "application/json",
             "Content-Type": "application/json",
             "X-Timeout": str(self.config.read_timeout),  # 服务端超时
-            "X-Retain-Images": "none",         # 移除所有图片
+            # "X-Retain-Images": "none",         # 移除所有图片
             "X-Return-Format": "markdown",     # 返回 Markdown 格式
             # 移除网页噪音元素（导航、页眉页脚、侧边栏、广告等）
             "X-Remove-Selector": "header,footer,nav,aside,.sidebar,.menu,.navigation,.nav,.ads,.advertisement,.social-share,.share-buttons,.related-posts,.comments,.cookie-banner",

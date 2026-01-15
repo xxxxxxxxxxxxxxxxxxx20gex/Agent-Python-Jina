@@ -2,3 +2,13 @@ workspace/*
 tmp/*
 data/*
 .env
+
+/mcp/mcp-python-interpreter/mcp_python_interpreter/__pycache__/
+*.py[oc]
+/mcp/mcp-python-interpreter/mcp_python_interpreter/build/
+/mcp/mcp-python-interpreter/mcp_python_interpreter/dist/
+/mcp/mcp-python-interpreter/mcp_python_interpreter/wheels/
+/mcp/mcp-python-interpreter/mcp_python_interpreter/test_dir/
+*.egg-info
+.pyirc
+/mcp/mcp-python-interpreter/mcp_python_interpreter/.venv

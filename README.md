@@ -49,10 +49,10 @@ APIKEY=sk-your-api-key                   # API 密钥
 
 MCPTools(
     transport="stdio",
-    command=r"python -m mcp_python_interpreter.main --dir C:\\Users\\填写自己的目录\\Desktop\\test-kimi\\play\\workspace --python-path D:\\app\\anaconda\\envs\\myconda\\python.exe",
+    command=r"python -m mcp_python_interpreter.main --dir C:\\Users\\【填写自己的目录】\\workspace --python-path 【填写自己的目录】\\python.exe",
     env={
         "MCP_ALLOW_SYSTEM_ACCESS": "0",
-        "PYTHONPATH": r"C:\\Users\\填写自己的目录\\Desktop\\test-kimi\\play\\mcp\\mcp-python-interpreter"
+        "PYTHONPATH": r"C:\\Users\\【填写自己的mcp目录】\\mcp-python-interpreter"
     }
 )
 
