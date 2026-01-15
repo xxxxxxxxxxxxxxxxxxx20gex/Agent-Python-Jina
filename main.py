@@ -53,7 +53,7 @@ deep_read_agent = Agent(
         # Python 解释器
         MCPTools(
             transport="stdio",
-            command=r"python -m mcp_python_interpreter.main --dir C:\\Users\\WUJIEAI\\Desktop\\test-kimi\\play\\workspace --python-path D:\\app\\anaconda\\envs\\myconda\\python.exe",
+            command=r"python -m mcp_python_interpreter.main --dir C:\\Users\\WUJIEAI\\Desktop\\test-kimi\\play\\workspace --python-path D:\\app\\anaconda\\envs\\lyq\\python.exe",
             env={
                 "MCP_ALLOW_SYSTEM_ACCESS": "0",
                 "PYTHONPATH": r"C:\\Users\\WUJIEAI\\Desktop\\test-kimi\\play\\mcp\\mcp-python-interpreter"  # 就是当前项目的mcp文件下的mcp-python-interpreter的绝对路径
