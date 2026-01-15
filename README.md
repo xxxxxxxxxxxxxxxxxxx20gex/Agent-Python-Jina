@@ -75,18 +75,6 @@ python main.py
 **功能：** 在隔离环境中执行 Python 代码，支持文件操作、包管理等
 
 
-#### server-puppeteer
-
-**功能：** 浏览器自动化，支持网页导航、截图、元素交互等
-
-**配置参数：**
-- `PUPPETEER_LAUNCH_OPTIONS`：浏览器启动选项（JSON 格式）
-  - `headless: true`：无头模式运行
-
-### 添加新的 MCP 服务器
-**查找 MCP 服务器：** 访问 [MCP Servers](https://mcp.so/) 查找可用的服务器
-
-
 ## MCP 服务器配置方式
 #### 1. 使用本地 MCP 服务器（推荐，启动更快）
 
