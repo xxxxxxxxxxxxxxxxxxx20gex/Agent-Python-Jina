@@ -1,4 +1,6 @@
 import os
+import signal
+import sys
 from agno.agent import Agent 
 from agno.models.openai.like import OpenAILike 
 from agno.db.sqlite import SqliteDb
@@ -33,10 +35,7 @@ deep_read_agent = Agent(
     enable_agentic_memory=True,  # 启用智能记忆管理
     add_memories_to_context=True,  # 将记忆添加到上下文
     add_history_to_context=True,  
-    num_history_runs=5,  # 增加历史记录数量
-    max_tool_calls_from_history=None,  # 限制历史中的工具调用
-    add_session_state_to_context=True,  # 启用会话状态
-    enable_agentic_state=True,  # 启用智能状态管理
+    num_history_runs=10,  # 增加历史记录数量
     cache_session=True,  # 启用会话缓存
 
     telemetry=False,
@@ -56,14 +55,16 @@ deep_read_agent = Agent(
             command=r"python -m mcp_python_interpreter.main --dir C:\\Users\\WUJIEAI\\Desktop\\test-kimi\\play\\workspace --python-path D:\\app\\anaconda\\envs\\lyq\\python.exe",
             env={
                 "MCP_ALLOW_SYSTEM_ACCESS": "0",
-                "PYTHONPATH": r"C:\\Users\\WUJIEAI\\Desktop\\test-kimi\\play\\mcp\\mcp-python-interpreter"  # 就是当前项目的mcp文件下的mcp-python-interpreter的绝对路径
-            }
+                "PYTHONPATH": r"C:\\Users\\WUJIEAI\\Desktop\\test-kimi\\play\\mcp\\mcp-python-interpreter",  # 就是当前项目的mcp文件下的mcp-python-interpreter的绝对路径
+            },
         ),
         # Puppeteer 浏览器自动化
         # MCPTools(
         #     transport="stdio", 
         #     command="npx -y @modelcontextprotocol/server-puppeteer",
-        #     env={"PUPPETEER_LAUNCH_OPTIONS": "{ \"headless\": true }"},
+        #     env={
+        #         "PUPPETEER_LAUNCH_OPTIONS": "{ \"headless\": true }",
+        #     },
         #     # exclude_tools= ['puppeteer_screenshot'],
         # ),
     ],
@@ -76,35 +77,29 @@ deep_read_agent = Agent(
     
     # === 输出配置 ===
     stream=True, 
-    store_tool_messages=False,  # 存储工具消息以便学习
+    store_tool_messages=True,  # 存储工具消息以便学习
     store_history_messages=True,  
-    store_media=False,
+    store_media=True,
     
     # === 调试配置 ===
-    debug_mode=False,  # 启用调试模式
+    debug_mode=True,  # 启用调试模式
     debug_level=1,  # 详细调试级别
     
     # === 系统描述 ===
     description="""你是一名高级AI助手，具备以下核心能力:
     
     1. **深度推理**：能够进行多步骤、结构化的思考过程
-    2. **长期记忆**：记住用户偏好、历史交互和重要信息
-    3. **持续学习**：从每次交互中学习并改进
-    4. **文化知识**：维护共享的知识体系和最佳实践
     5. **工具使用**：熟练运用各种工具完成任务
     6. **上下文理解**：全面理解会话历史和当前状态
     
     你的目标是提供准确、深入、个性化的帮助。在回答前，请：
     - 进行充分的推理和思考
-    - 查阅相关记忆和知识
     - 必要时使用工具验证信息
     - 提供结构化的、详细的回答
     """,
     
     instructions=[
         "在回答复杂问题前，总是进行多步骤推理",
-        "主动使用记忆工具记录重要信息",
-        "当发现新的模式或最佳实践时，更新文化知识",
         "充分利用历史上下文提供个性化回答",
         "在不确定时，使用工具验证信息",
         "提供详细、结构化的回答，包含推理过程",
@@ -117,12 +112,6 @@ deep_read_agent = Agent(
     3. 相关背景信息
     4. 可操作的建议（如适用）
     """,
-    
-    # === 重试机制 ===
-    retries=1,  # 增加重试次数
-    delay_between_retries=1,
-    exponential_backoff=True,
-    
 )
 
 agent_os = AgentOS(
