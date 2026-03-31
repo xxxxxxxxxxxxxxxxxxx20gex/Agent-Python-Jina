@@ -1,11 +1,15 @@
 import os
 import signal
 import sys
+import shutil
+from pathlib import Path
+from urllib.parse import urlparse
 from agno.agent import Agent 
 from agno.models.openai.like import OpenAILike 
 from agno.db.sqlite import SqliteDb
 from agno.os import AgentOS
 from agno.tools.mcp import MCPTools
+from agno.skills import Skills, LocalSkills
 from agno.memory import MemoryManager
 from agno.learn.machine import LearningMachine
 from agno.culture.manager import CultureManager
@@ -20,16 +24,83 @@ BASEURL = os.getenv("BASEURL")
 APIKEY = os.getenv("APIKEY")
 JINA = os.getenv("JINA")
 
+SKILLS_DIR = Path(__file__).parent / "workspace" / "skills"
+
+def _normalize_openai_base_url(raw: str | None) -> str | None:
+    """Normalize base_url for OpenAI-compatible clients.
+
+    Gateways sometimes provide a full endpoint URL (e.g. .../v1/chat/completions).
+    OpenAI-compatible clients will append resource paths themselves, so we keep
+    base_url at the API root (typically .../v1) to avoid duplicated paths.
+    """
+    if not raw:
+        return raw
+
+    base = raw.strip().rstrip("/")
+    lowered = base.lower()
+    for suffix in ("/chat/completions", "/completions", "/models"):
+        if lowered.endswith(suffix):
+            base = base[: -len(suffix)].rstrip("/")
+            lowered = base.lower()
+
+    # Best-effort validation; if it's not a URL, still return trimmed string.
+    try:
+        parsed = urlparse(base)
+        if parsed.scheme and parsed.netloc:
+            return base
+    except Exception:
+        pass
+    return base
+
+
+def _build_mcp_tools() -> list:
+    """Create MCP tool list, skipping tools with missing executables."""
+    tools = []
+
+    # Prefer the current interpreter to avoid stale hardcoded paths.
+    python_exe = sys.executable
+    work_dir = r"C:\\Users\\WUJIEAI\\Desktop\\me_workplace\\Agent-Python-Jina\\workspace"
+    mcp_project = r"C:\\Users\\WUJIEAI\\Desktop\\me_workplace\\Agent-Python-Jina\\mcp\\mcp-python-interpreter"
+
+    tools.append(
+        MCPTools(
+            transport="stdio",
+            command=(
+                f"\"{python_exe}\" -m mcp_python_interpreter.main "
+                f"--dir \"{work_dir}\" --python-path \"{python_exe}\""
+            ),
+            env={
+                "MCP_ALLOW_SYSTEM_ACCESS": "0",
+                "PYTHONPATH": mcp_project,
+            },
+        )
+    )
+
+    # Puppeteer requires Node.js (npx). Skip if missing.
+    if shutil.which("npx"):
+        tools.append(
+            MCPTools(
+                transport="stdio",
+                command="npx -y @modelcontextprotocol/server-puppeteer",
+                env={
+                    "PUPPETEER_LAUNCH_OPTIONS": "{ \"headless\": true }",
+                },
+            )
+        )
+
+    return tools
+
 db = SqliteDb(db_file="tmp/test_workflow.db")
 
 deep_read_agent = Agent(
     name="智能助手",
     model=OpenAILike(
         id=CC,
-        base_url=BASEURL,
+        base_url=_normalize_openai_base_url(BASEURL),
         api_key=APIKEY,
         temperature=0.2,  # 略微提高温度以增加创造性
     ),
+    skills=Skills(loaders=[LocalSkills(str(SKILLS_DIR))]),
     db = db,
     enable_user_memories=True,  # 启用用户记忆
     enable_agentic_memory=True,  # 启用智能记忆管理
@@ -41,33 +112,7 @@ deep_read_agent = Agent(
     telemetry=False,
     
     # === 工具配置 ===
-    tools=[
-        JinaReaderTools(
-            enable_read_url=True,       # 启用 URL 读取
-            enable_search_query=False,  # 关闭搜索功能
-            enable_deep_search=False,   # 关闭深度搜索
-            api_key=JINA,
-            instructions="read_url(url) - 读取 URL 完整正文",
-        ),
-        # Python 解释器
-        MCPTools(
-            transport="stdio",
-            command=r"python -m mcp_python_interpreter.main --dir C:\\Users\\WUJIEAI\\Desktop\\test-kimi\\play\\workspace --python-path D:\\app\\anaconda\\envs\\lyq\\python.exe",
-            env={
-                "MCP_ALLOW_SYSTEM_ACCESS": "0",
-                "PYTHONPATH": r"C:\\Users\\WUJIEAI\\Desktop\\test-kimi\\play\\mcp\\mcp-python-interpreter",  # 就是当前项目的mcp文件下的mcp-python-interpreter的绝对路径
-            },
-        ),
-        # Puppeteer 浏览器自动化
-        # MCPTools(
-        #     transport="stdio", 
-        #     command="npx -y @modelcontextprotocol/server-puppeteer",
-        #     env={
-        #         "PUPPETEER_LAUNCH_OPTIONS": "{ \"headless\": true }",
-        #     },
-        #     # exclude_tools= ['puppeteer_screenshot'],
-        # ),
-    ],
+    tools=_build_mcp_tools(),
 
     # === 上下文增强 ===
     markdown=True,

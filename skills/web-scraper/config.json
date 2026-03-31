@@ -1,0 +1,27 @@
+{
+  "scraper": {
+    "delay": 2,
+    "timeout": 15,
+    "max_retries": 3,
+    "user_agent": "Research Bot (respectful crawler)",
+    "respect_robots_txt": true
+  },
+  "output": {
+    "default_format": "json",
+    "save_html": false,
+    "save_text": true,
+    "create_subdirs": true
+  },
+  "extraction": {
+    "remove_scripts": true,
+    "remove_styles": true,
+    "extract_meta": true,
+    "extract_links": true,
+    "extract_images": true
+  },
+  "limits": {
+    "max_page_size_mb": 10,
+    "max_batch_size": 100,
+    "max_concurrent": 1
+  }
+}

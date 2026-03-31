@@ -38,7 +38,7 @@ cp .env_example .env
 2. 编辑 `.env`，配置模型参数：
 ```env
 CC=claude-4.5-sonnet                    # 模型 ID
-BASEURL=https://api.example.com/v1      # API 基础 URL
+BASEURL=https://higress-api.wujieai.com/v1  # API 基础 URL（不要填到 /chat/completions）
 APIKEY=sk-your-api-key                   # API 密钥
 ```
 

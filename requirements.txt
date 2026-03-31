@@ -1,4 +1,4 @@
-agno==2.3.25
+agno
 openai
 sqlalchemy
 fastapi
